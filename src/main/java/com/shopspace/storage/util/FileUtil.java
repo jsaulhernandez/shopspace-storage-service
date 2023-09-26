@@ -131,7 +131,7 @@ public class FileUtil {
      * @param f file
      * @return get file size in kilobyte
      */
-    public int getFileSizeKb(File f) {
+    public Integer getFileSizeKb(File f) {
         try {
             return (int) (f.length() / 1024);
         } catch (Exception e) {
