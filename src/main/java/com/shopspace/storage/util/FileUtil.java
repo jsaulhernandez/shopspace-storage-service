@@ -99,7 +99,7 @@ public class FileUtil {
             // ClassLoader classLoader = getClass().getClassLoader();
             // String path = classLoader.getResource(".").getFile() + "tmp/";
 
-            String path = new ClassPathResource(".").getFile().getPath() + "tmp/";
+            String path = new ClassPathResource(".").getFile().getPath() + "/tmp/";
 
             File folder = new File(path);
 
