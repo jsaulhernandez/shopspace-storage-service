@@ -123,6 +123,8 @@ public class FirebaseStorageUtil {
         try {
             Blob exists = this.getBlobFile(name, folder);
 
+            if (exists == null) return false;
+
             return exists.delete();
         } catch (Exception e) {
             e.printStackTrace();

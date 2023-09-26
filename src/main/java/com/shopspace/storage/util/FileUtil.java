@@ -6,6 +6,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +21,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class FileUtil {
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${files.validations.availableFormats}")
     private Set<String> defaultAvailableFormats;
@@ -95,8 +96,10 @@ public class FileUtil {
 
             if (os.equals("linux")) return "/tmp";
 
-            ClassLoader classLoader = getClass().getClassLoader();
-            String path = Objects.requireNonNull(classLoader.getResource(".")).getFile() + "tmp/";
+            // ClassLoader classLoader = getClass().getClassLoader();
+            // String path = classLoader.getResource(".").getFile() + "tmp/";
+
+            String path = new ClassPathResource(".").getFile().getPath() + "tmp/";
 
             File folder = new File(path);
 
