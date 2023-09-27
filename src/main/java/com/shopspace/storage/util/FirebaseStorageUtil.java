@@ -12,8 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -24,21 +22,22 @@ import java.io.IOException;
 public class FirebaseStorageUtil {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
-    FirebaseProperties firebaseProperties;
-    @Autowired
     private FileUtil fileUtil;
     @Value("${files.validations.fileSize.min}")
     private Integer minFileSize;
     @Value("${files.validations.fileSize.max}")
     private Integer maxFileSize;
 
-    @EventListener
-    public void init(ApplicationReadyEvent event) {
+    public FirebaseStorageUtil(@Value("${firebase.config-file}") String configFile, @Value("${firebase.bucket-name}") String bucketName) {
+        this.init(configFile, bucketName);
+    }
+
+    public void init(String configFile, String bucketName) {
         // initialize Firebase
         try {
-            ClassPathResource serviceAccount = new ClassPathResource("firebase.json");
+            ClassPathResource serviceAccount = new ClassPathResource(configFile);
 
-            FirebaseOptions options = new FirebaseOptions.Builder().setCredentials(GoogleCredentials.fromStream(serviceAccount.getInputStream())).setStorageBucket(firebaseProperties.getBucketName()).build();
+            FirebaseOptions options = new FirebaseOptions.Builder().setCredentials(GoogleCredentials.fromStream(serviceAccount.getInputStream())).setStorageBucket(bucketName).build();
             FirebaseApp.initializeApp(options);
 
             logger.info("Is Firebase Started: " + FirebaseApp.getInstance().getName());
@@ -107,6 +106,7 @@ public class FirebaseStorageUtil {
      * @return boolean if the file is deleted
      */
     public boolean deleteWithPath(String path) {
+        logger.info("path to remove {}", path);
         String name = fileUtil.getNameFromPath(path);
         String folder = fileUtil.getFolderFromPath(path);
 
@@ -152,7 +152,7 @@ public class FirebaseStorageUtil {
         try {
             Bucket bucket = this.getBucket();
             logger.info("instantiating the bucket: {}", bucket.getName());
-            logger.info("path of firebase: {}", path);
+            logger.info("path to download: {}", path);
 
             return bucket.get(path);
         } catch (Exception e) {
